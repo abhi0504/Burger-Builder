@@ -16,7 +16,7 @@ const burgerControls = (props) => {
       <div className={classes.BurgerControls}>
         {controls.map(ctrl =>
            (
-          <BurgerControl key={ctrl.label}  label={ctrl.label}   />
+          <BurgerControl key={ctrl.label}  label={ctrl.label} added={() => props.itemAdded(ctrl.type)} />
         ) )}
       </div>
     </div>

@@ -4,15 +4,17 @@ import classes from './Burger.css'
 import BurgerItem from './BurgerItem/BurgerItem'
 
 const burger = (props) => {
-
-let transformedItems = Object.keys(props.items).map(igkey => {
-  return [...Array( props.items[igkey] )].map( (_,i) => {
-    return <BurgerItem key={igkey + i} type={igkey} />
-})
+ let transformedItems = Object.keys(props.items)
+  .map(igkey => {
+    return [...Array( props.items[igkey] )].map( (_, i) => {
+      return <BurgerItem key={igkey + i} type={igkey} />
+    })
 })
 .reduce((arr , el) => {
-  return( arr.concat(el) )
+  return arr.concat(el)
 } , []);
+
+console.log(transformedItems);
 
 if(transformedItems.length === 0)
 {
