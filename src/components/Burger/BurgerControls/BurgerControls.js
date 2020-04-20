@@ -17,13 +17,18 @@ const burgerControls = (props) => {
       <p><strong>PRICE : {props.burgerPrice.toFixed(2)} $ </strong></p>
         {controls.map(ctrl =>
            (
-          <BurgerControl key={ctrl.label}
+          <BurgerControl
+          key={ctrl.label}
           label={ctrl.label}
           added={() => props.itemAdded(ctrl.type)}
           deleted={() => props.itemdelete(ctrl.type)}
           disabledInfo = {props.disabledInfo[ctrl.type]}
           />
         ) )}
+        <button
+        className={classes.OrderButton}
+        disabled={!props.purchasable}>
+        ORDER NOW</button>
       </div>
     </div>
   )

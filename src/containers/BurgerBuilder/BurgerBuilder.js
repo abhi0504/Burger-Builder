@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import Auxilary from '../../hoc/aux/auxilary'
 import Burger from '../../components/Burger/Burger'
 import BurgerControls from '../../components/Burger/BurgerControls/BurgerControls'
+import Modal from '../../components/UI/Modal/Modal'
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
+
 
 const ITEMS_PRICES = {
   salad: 0.5,
@@ -20,8 +23,19 @@ class BurgerBuilder extends Component {
      meat: 0,
      bacon: 0
    },
+   totalPrice: 4,
+   purchasable: false
+ }
 
-   totalPrice: 4
+ purchasableUpdate(items)
+ {
+   const sum = Object.keys(items)
+   .map(igkey =>
+     {return items[igkey]})
+   .reduce((sum , el) =>
+     {return sum + el}
+    , 0);
+    this.setState({purchasable : sum > 0})
  }
 
  addItemsHandler = (type) =>
@@ -36,8 +50,8 @@ class BurgerBuilder extends Component {
    const oldPrice = this.state.totalPrice
    const newPrice = oldPrice + priceAddition
    this.setState({items : updatedItems , totalPrice : newPrice})
-
- }
+   this.purchasableUpdate(updatedItems);
+  }
 
  deleteItemsHandler = (type) =>
  {
@@ -51,7 +65,7 @@ class BurgerBuilder extends Component {
    const oldPrice = this.state.totalPrice
    const newPrice = oldPrice - priceDeduction
    this.setState({items : updatedItems , totalPrice : newPrice})
-
+   this.purchasableUpdate(updatedItems);
  }
 
   render() {
@@ -67,11 +81,15 @@ class BurgerBuilder extends Component {
 
     return (
       <Auxilary>
+      <Modal>
+        <OrderSummary ingredients={this.state.items} />
+      </Modal>
       <Burger items={this.state.items} />
       <BurgerControls itemAdded={this.addItemsHandler}
       itemdelete={this.deleteItemsHandler}
       disabledInfo = {disabledInfo}
       burgerPrice = {this.state.totalPrice}
+      purchasable = {this.state.purchasable}
        />
       </Auxilary>
     )
