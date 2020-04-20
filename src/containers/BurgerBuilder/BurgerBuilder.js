@@ -1,99 +1,114 @@
-import React, { Component } from 'react'
-import Auxilary from '../../hoc/aux/auxilary'
-import Burger from '../../components/Burger/Burger'
-import BurgerControls from '../../components/Burger/BurgerControls/BurgerControls'
-import Modal from '../../components/UI/Modal/Modal'
-import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary'
+import React, { Component } from 'react';
 
+import Auxilary from '../../hoc/aux/auxilary';
+import Burger from '../../components/Burger/Burger';
+import BuildControls from '../../components/Burger/BuildControls/BuildControls';
+import Modal from '../../components/UI/Modal/Modal';
+import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 
-const ITEMS_PRICES = {
-  salad: 0.5,
-  cheese: 0.8,
-  meat: 1.3,
-  bacon: 0.4
-}
+const INGREDIENT_PRICES = {
+    salad: 0.5,
+    cheese: 0.4,
+    meat: 1.3,
+    bacon: 0.7
+};
 
 class BurgerBuilder extends Component {
 
- state = {
-
-   items: {
-     salad: 0,
-     cheese: 0,
-     meat: 0,
-     bacon: 0
-   },
-   totalPrice: 4,
-   purchasable: false
- }
-
- purchasableUpdate(items)
- {
-   const sum = Object.keys(items)
-   .map(igkey =>
-     {return items[igkey]})
-   .reduce((sum , el) =>
-     {return sum + el}
-    , 0);
-    this.setState({purchasable : sum > 0})
- }
-
- addItemsHandler = (type) =>
- {
-   const oldCount = this.state.items[type];
-   const updatedCount = oldCount + 1;
-   const updatedItems = {
-     ...this.state.items
-   }
-   updatedItems[type] = updatedCount
-   const priceAddition = ITEMS_PRICES[type]
-   const oldPrice = this.state.totalPrice
-   const newPrice = oldPrice + priceAddition
-   this.setState({items : updatedItems , totalPrice : newPrice})
-   this.purchasableUpdate(updatedItems);
-  }
-
- deleteItemsHandler = (type) =>
- {
-   const oldCount = this.state.items[type];
-   const updatedCount = oldCount - 1;
-   const updatedItems = {
-     ...this.state.items
-   }
-   updatedItems[type] = updatedCount
-   const priceDeduction = ITEMS_PRICES[type]
-   const oldPrice = this.state.totalPrice
-   const newPrice = oldPrice - priceDeduction
-   this.setState({items : updatedItems , totalPrice : newPrice})
-   this.purchasableUpdate(updatedItems);
- }
-
-  render() {
-
-    const disabledInfo = {
-      ...this.state.items
+    state = {
+        ingredients: {
+            salad: 0,
+            bacon: 0,
+            cheese: 0,
+            meat: 0
+        },
+        totalPrice: 4,
+        purchasable: false,
+        purchasing: false
     }
 
-    for (let key in disabledInfo)
-    {
-      disabledInfo[key] = disabledInfo[key] <= 0
+    updatePurchaseState (ingredients) {
+        const sum = Object.keys( ingredients )
+            .map( igKey => {
+                return ingredients[igKey];
+            } )
+            .reduce( ( sum, el ) => {
+                return sum + el;
+            }, 0 );
+        this.setState( { purchasable: sum > 0 } );
     }
 
-    return (
-      <Auxilary>
-      <Modal>
-        <OrderSummary ingredients={this.state.items} />
-      </Modal>
-      <Burger items={this.state.items} />
-      <BurgerControls itemAdded={this.addItemsHandler}
-      itemdelete={this.deleteItemsHandler}
-      disabledInfo = {disabledInfo}
-      burgerPrice = {this.state.totalPrice}
-      purchasable = {this.state.purchasable}
-       />
-      </Auxilary>
-    )
-  }
+    addIngredientHandler = ( type ) => {
+        const oldCount = this.state.ingredients[type];
+        const updatedCount = oldCount + 1;
+        const updatedIngredients = {
+            ...this.state.ingredients
+        };
+        updatedIngredients[type] = updatedCount;
+        const priceAddition = INGREDIENT_PRICES[type];
+        const oldPrice = this.state.totalPrice;
+        const newPrice = oldPrice + priceAddition;
+        this.setState( { totalPrice: newPrice, ingredients: updatedIngredients } );
+        this.updatePurchaseState(updatedIngredients);
+    }
+
+    removeIngredientHandler = ( type ) => {
+        const oldCount = this.state.ingredients[type];
+        if ( oldCount <= 0 ) {
+            return;
+        }
+        const updatedCount = oldCount - 1;
+        const updatedIngredients = {
+            ...this.state.ingredients
+        };
+        updatedIngredients[type] = updatedCount;
+        const priceDeduction = INGREDIENT_PRICES[type];
+        const oldPrice = this.state.totalPrice;
+        const newPrice = oldPrice - priceDeduction;
+        this.setState( { totalPrice: newPrice, ingredients: updatedIngredients } );
+        this.updatePurchaseState(updatedIngredients);
+    }
+
+    purchaseHandler = () => {
+        this.setState({purchasing: true});
+    }
+
+    purchaseCancelHandler = () => {
+        this.setState({purchasing: false});
+    }
+
+    purchaseContinueHandler = () => {
+        alert('You continue!');
+    }
+
+    render () {
+        const disabledInfo = {
+            ...this.state.ingredients
+        };
+        for ( let key in disabledInfo ) {
+            disabledInfo[key] = disabledInfo[key] <= 0
+        }
+        // {salad: true, meat: false, ...}
+        return (
+            <Auxilary>
+                <Modal show={this.state.purchasing} modalClosed={this.purchaseCancelHandler}>
+                    <OrderSummary
+                        ingredients={this.state.ingredients}
+                        price={this.state.totalPrice}
+                        purchaseCancelled={this.purchaseCancelHandler}
+                        purchaseContinued={this.purchaseContinueHandler} />
+                </Modal>
+                <Burger ingredients={this.state.ingredients} />
+                <BuildControls
+                    ingredientAdded={this.addIngredientHandler}
+                    ingredientRemoved={this.removeIngredientHandler}
+                    disabled={disabledInfo}
+                    purchasable={this.state.purchasable}
+                    ordered={this.purchaseHandler}
+                    price={this.state.totalPrice} />
+            </Auxilary>
+        );
+    }
 }
 
-export default BurgerBuilder
+export default BurgerBuilder;
