@@ -12,7 +12,7 @@ const purchaseInit = ( state, action ) => {
 };
 
 const purchaseBurgerStart = ( state, action ) => {
-    return updateObject( state, { loading: false } );
+    return updateObject( state, { loading: true } );
 };
 
 const purchaseBurgerSuccess = ( state, action ) => {
@@ -35,7 +35,7 @@ const fetchOrdersStart = ( state, action ) => {
 const fetchOrdersSuccess = ( state, action ) => {
     return updateObject( state, {
         orders: action.orders,
-        loading: false
+        loading: true
     } );
 };
 
